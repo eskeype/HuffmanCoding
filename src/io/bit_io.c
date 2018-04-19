@@ -3,12 +3,19 @@
 #include <stdbool.h>
 #include "bit_io.h"
 
+/*
+0x80 corresponds to 1000 0000 in binary
+This is used to sequence through buffers one bit at a time
+*/
+
+unsigned char BUFFER_MASK_INIT = 0x80;
+
 bit_file_handler* write_bit_init(const char *filename){
 	bit_file_handler* handler = (bit_file_handler*) malloc(sizeof(bit_file_handler));
 	
 	handler -> file = fopen(filename, "wb");
 	handler -> buffer = 0;
-	handler -> buffer_mask = 0x80;
+	handler -> buffer_mask = BUFFER_MASK_INIT;
 
 	return handler;
 
@@ -25,7 +32,7 @@ void write_bit(bit_file_handler *handler, bool bit){
 		fputc(handler -> buffer, handler -> file);
 	
 		handler -> buffer = 0;
-		handler -> buffer_mask = 0x80;
+		handler -> buffer_mask = BUFFER_MASK_INIT;
 	}
 }
 
@@ -40,7 +47,7 @@ bit_file_handler* read_bit_init(const char *filename){
 	
 	handler -> file = fopen(filename, "rb");
 	handler -> buffer = fgetc(handler -> file);
-	handler -> buffer_mask = 0x80;
+	handler -> buffer_mask = BUFFER_MASK_INIT;
 
 	return handler;
 }
@@ -52,7 +59,7 @@ bool read_bit(bit_file_handler *handler){
 
 	if((handler -> buffer_mask) == 0){
 		handler -> buffer = fgetc(handler -> file);
-		handler -> buffer_mask = 0x80;
+		handler -> buffer_mask = BUFFER_MASK_INIT;
 	}
 
 	return out;
